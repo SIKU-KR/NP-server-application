@@ -14,7 +14,7 @@ import java.util.*;
  * File "/src/main/resources/application.properties" configures connection information.
  */
 
-public class DBConnection {
+public abstract class DBConnection {
     private String url;
     private String user;
     private String password;

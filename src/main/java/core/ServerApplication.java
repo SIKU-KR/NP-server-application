@@ -1,5 +1,7 @@
 package core;
 
+import core.common.AppLogger;
+
 /**
  * Start point of Server Application
  * Create ServerSocketController with ChatModel, RoomModel, UserModel (Dependency Injection)

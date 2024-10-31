@@ -13,7 +13,7 @@ class DBConnectionTest {
 
     @BeforeEach
     void setUp() {
-        dbConnection = new DBConnection();
+        dbConnection = new RoomModel();
     }
 
     @Test
