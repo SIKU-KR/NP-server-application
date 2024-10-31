@@ -3,9 +3,6 @@ package core;
 import core.Controller.ChatController;
 import core.Controller.ListRoomController;
 import core.Controller.NewRoomController;
-import core.Model.ChatModel;
-import core.Model.RoomModel;
-import core.Model.UserModel;
 
 /**
  * ServerSocketController manages Context of Controllers
@@ -13,20 +10,14 @@ import core.Model.UserModel;
  */
 public class ServerSocketManager {
 
-
     private ListRoomController listRoomController;
     private NewRoomController newRoomController;
     private ChatController chatController;
 
     public void run(){
-        listRoomController = new ListRoomController();
-        listRoomController.run();
-
-        newRoomController = new NewRoomController();
-        newRoomController.run();
-
-        chatController = new ChatController();
-        chatController.run();
+        new Thread(() -> listRoomController = new ListRoomController()).start();
+        new Thread(() -> newRoomController = new NewRoomController()).start();
+        new Thread(() -> chatController = new ChatController()).start();
     }
 
 }

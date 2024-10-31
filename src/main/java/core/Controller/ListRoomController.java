@@ -1,6 +1,8 @@
 package core.Controller;
 
+import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 
 /**
  * ListRoomController manages TCP/IP connection for Clients try to get List of ChatRooms
@@ -12,7 +14,19 @@ public class ListRoomController {
 
     private ServerSocket serverSocket;
 
-    public void run(){
+    public ListRoomController() {
+        run();
+    }
 
+    public void run(){
+        try{
+            serverSocket = new ServerSocket(10001);
+            System.out.println("List room protocol listening from port:10001");
+            while(true){
+                Socket socket = serverSocket.accept();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
