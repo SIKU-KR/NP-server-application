@@ -1,4 +1,4 @@
-package core.Model;
+package core.model;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -6,21 +6,22 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.Properties;
+import java.util.*;
 
 /**
- * DBConnection is Abstract class to connect database(MySQL)
+ * DBConnection is class to connect database(MySQL)
  * Must be inherited to use connection to database
  * File "/src/main/resources/application.properties" configures connection information.
  */
 
-public abstract class DBConnection {
+public class DBConnection {
     private String url;
     private String user;
     private String password;
 
     public DBConnection() {
         loadDatabaseConfig();
+        System.out.println("Connected to the database");
     }
 
     private void loadDatabaseConfig() {
@@ -35,13 +36,23 @@ public abstract class DBConnection {
         }
     }
 
-    public ResultSet executeQuery(String query) {
-        try(Connection connection = DriverManager.getConnection(url, user, password)){
-            Statement statement = connection.createStatement();
-            return statement.executeQuery(query);
-        } catch(Exception e) {
+    public List<Map<String, Object>> executeQuery(String query) {
+        List<Map<String, Object>> results = new ArrayList<>();
+        try (Connection connection = DriverManager.getConnection(url, user, password);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+
+            int columnCount = resultSet.getMetaData().getColumnCount();
+            while (resultSet.next()) {
+                Map<String, Object> row = new HashMap<>();
+                for (int i = 1; i <= columnCount; i++) {
+                    row.put(resultSet.getMetaData().getColumnName(i), resultSet.getObject(i));
+                }
+                results.add(row);
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return results;
     }
 }

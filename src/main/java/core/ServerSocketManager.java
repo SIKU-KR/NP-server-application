@@ -1,8 +1,8 @@
 package core;
 
-import core.Controller.ChatController;
-import core.Controller.ListRoomController;
-import core.Controller.NewRoomController;
+import core.controller.ChatController;
+import core.controller.ListRoomController;
+import core.controller.NewRoomController;
 
 /**
  * ServerSocketController manages Context of Controllers
