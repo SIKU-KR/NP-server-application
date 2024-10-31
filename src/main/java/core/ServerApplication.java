@@ -1,11 +1,5 @@
 package core;
 
-import core.Controller.ServerSocketController;
-import core.Model.ChatModel;
-import core.Model.RoomModel;
-import core.Model.UserModel;
-
-
 /**
  * Start point of Server Application
  * Create ServerSocketController with ChatModel, RoomModel, UserModel (Dependency Injection)
@@ -14,10 +8,8 @@ import core.Model.UserModel;
 public class ServerApplication {
 
     public static void main(String[] args) {
-        ServerSocketController serverSocketController = new ServerSocketController(
-                new ChatModel(), new RoomModel(), new UserModel()
-        );
-        serverSocketController.run();
+        ServerSocketManager serverSocketManager = new ServerSocketManager();
+        serverSocketManager.run();
     }
 
 }
