@@ -1,11 +1,10 @@
 package core.model;
 
+import core.common.AppLogger;
+
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.*;
 
 /**
@@ -32,13 +31,13 @@ public abstract class DBConnection {
             this.user = properties.getProperty("db.username");
             this.password = properties.getProperty("db.password");
         } catch (IOException e) {
-            e.printStackTrace();
+            AppLogger.error(e.getMessage());
         }
     }
 
     public List<Map<String, Object>> executeQuery(String query) {
         List<Map<String, Object>> results = new ArrayList<>();
-        try (Connection connection = DriverManager.getConnection(url, user, password);
+        try (Connection connection = getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
 
@@ -51,8 +50,12 @@ public abstract class DBConnection {
                 results.add(row);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            AppLogger.error(e.getMessage());
         }
         return results;
+    }
+
+    public Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(url, user, password);
     }
 }

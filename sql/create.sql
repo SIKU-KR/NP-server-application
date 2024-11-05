@@ -9,6 +9,7 @@ CREATE TABLE Chat
 (
     id        INT PRIMARY KEY,
     title     VARCHAR(255),
+    creator   VARCHAR(255),
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
