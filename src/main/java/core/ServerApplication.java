@@ -9,8 +9,10 @@ import core.common.AppLogger;
  */
 public class ServerApplication {
 
+    private static int PORT = 10001;
+
     public static void main(String[] args) {
-        ServerSocketManager serverSocketManager = new ServerSocketManager();
+        ServerSocketManager serverSocketManager = new ServerSocketManager(PORT);
         serverSocketManager.run();
     }
 

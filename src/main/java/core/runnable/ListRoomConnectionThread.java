@@ -1,5 +1,6 @@
-package core.thread;
+package core.runnable;
 
+import core.common.AppLogger;
 import core.dto.ChatRoom;
 import core.model.RoomModel;
 
@@ -18,26 +19,31 @@ public class ListRoomConnectionThread implements Runnable {
 
     private final Socket socket;
     private final RoomModel roomModel;
+    private final Object requestMsg;
 
-    public ListRoomConnectionThread(Socket socket, RoomModel roomModel) {
+    public ListRoomConnectionThread(Socket socket, RoomModel roomModel, Object requestMsg) {
         this.socket = socket;
         this.roomModel = roomModel;
+        this.requestMsg = requestMsg;
     }
 
     @Override
     public void run() {
         try {
-            sendRoomList();
+            sendRoomList(getRoomList());
         } catch (IOException e) {
-            e.printStackTrace();
+            AppLogger.error(e.getMessage());
         } finally {
             closeSocket();
         }
     }
 
-    private void sendRoomList() throws IOException {
+    private List<ChatRoom> getRoomList() {
+        return roomModel.readRoomList();
+    }
+
+    private void sendRoomList(List<ChatRoom> response) throws IOException {
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream())) {
-            List<ChatRoom> response = roomModel.readRoomList();
             objectOutputStream.writeObject(response);
             objectOutputStream.flush();
         }
@@ -45,9 +51,11 @@ public class ListRoomConnectionThread implements Runnable {
 
     private void closeSocket() {
         try {
-            socket.close();
+            if(!socket.isClosed()) {
+                socket.close();
+            }
         } catch (IOException e) {
-            e.printStackTrace();
+            AppLogger.error(e.getMessage());
         }
     }
 }
