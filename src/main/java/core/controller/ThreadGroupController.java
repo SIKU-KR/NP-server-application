@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ThreadGroupController {
     private static ThreadGroupController instance;
 
-    private Map<Integer, ThreadGroup> threadGroups;
+    private final Map<Integer, ThreadGroup> threadGroups;
 
     private ThreadGroupController() {
         this.threadGroups = new ConcurrentHashMap<>();

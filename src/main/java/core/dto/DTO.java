@@ -6,8 +6,8 @@ import java.io.Serializable;
 
 public class DTO implements Serializable {
 
-    private RequestType requestType;
-    private Object requestMsg;
+    private final RequestType requestType;
+    private final Object requestMsg;
 
     public DTO(RequestType requestType, Object requestMsg) {
         this.requestType = requestType;

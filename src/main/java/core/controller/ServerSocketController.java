@@ -22,11 +22,11 @@ public class ServerSocketController {
 
     private static ServerSocketController instance;
 
-    private int port;
+    private final int port;
     private ServerSocket serverSocket;
 
-    private RoomModel roomModel;
-    private ChatModel chatModel;
+    private final RoomModel roomModel;
+    private final ChatModel chatModel;
 
 
     private ServerSocketController(int port) {
