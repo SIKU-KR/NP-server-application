@@ -7,6 +7,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
+/**
+ * Access to Message table in MySQL dbms.
+ */
 public class ChatModel extends DBConnection {
 
     public void createNewMsg(Integer chatId, Integer userId, String text){

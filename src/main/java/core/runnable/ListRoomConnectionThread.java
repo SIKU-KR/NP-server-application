@@ -10,10 +10,7 @@ import java.net.Socket;
 import java.util.List;
 
 /**
- * ListRoomConnectionThread implements Runnable, which means Thread.
- * This class' instance is created and run by ListRoomController
- * 1. Thread reads information from database using RoomModel Instance
- * 2. Disconnects when client receives created response
+ * Handler thread for connection to get a list of chat rooms.
  */
 public class ListRoomConnectionThread implements Runnable {
 

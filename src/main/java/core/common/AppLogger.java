@@ -3,6 +3,10 @@ package core.common;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * Log-writer class using Log4j
+ * 1. Supports 4-level logging (info, error, debug, warn)
+ */
 public class AppLogger {
 
     private static final Logger logger = LogManager.getLogger(AppLogger.class);
@@ -23,7 +27,4 @@ public class AppLogger {
         logger.warn(message);
     }
 
-    public static void error(String message, Throwable throwable) {
-        logger.error(message, throwable);
-    }
 }

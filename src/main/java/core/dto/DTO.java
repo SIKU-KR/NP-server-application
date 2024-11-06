@@ -4,6 +4,11 @@ import core.common.RequestType;
 
 import java.io.Serializable;
 
+/**
+ * All requests to server socket should be wrapped by this DTO class.
+ * 1. RequestType : Enum type value (core/common/RequestType.java)
+ * 2. RequestMsg : RequestMsgs as an object (core/dto/*)
+ */
 public class DTO implements Serializable {
 
     private final RequestType requestType;

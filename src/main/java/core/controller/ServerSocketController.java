@@ -16,7 +16,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
- * ServerSocketController manages Context of Controllers
+ * ServerSocketController manages context of ServerSocket
+ * 1. Implements singleton pattern to guarantee single instance
+ * 2. "PORT" is specified by ServerApplication.java
+ * 3. connectionHandler() : maps handler threads(methods) based on RequestType(Enum class)
  */
 public class ServerSocketController {
 
@@ -86,8 +89,9 @@ public class ServerSocketController {
 
     private void newChatThread(Socket socket, DTO dto) {
         Integer chatId = ((ChatConnection) dto.getRequestMsg()).getChatId();
-        ThreadGroup chatGroup = ThreadGroupController.getInstance().getOrCreateThreadGroup(chatId);
-        new Thread(chatGroup, new ConnectChatConnectionThread(socket, chatModel, dto.getRequestMsg())).start();
+        ConnectChatConnectionThread connectChatConnectionThread = new ConnectChatConnectionThread(socket, chatModel, dto.getRequestMsg());
+        ChatThreadsController.getInstance().addThread(chatId, connectChatConnectionThread);
+        new Thread(connectChatConnectionThread).start();
     }
 
 }
