@@ -1,7 +1,8 @@
-package core;
+package core.controller;
 
 import core.common.AppLogger;
 import core.common.RequestType;
+import core.dto.requestmsg.ChatConnection;
 import core.dto.DTO;
 import core.model.ChatModel;
 import core.model.RoomModel;
@@ -17,18 +18,23 @@ import java.net.Socket;
 /**
  * ServerSocketController manages Context of Controllers
  */
-public class ServerSocketManager {
+public class ServerSocketController {
 
     private ServerSocket serverSocket;
+
+    private ThreadGroupController threadGroupController;
     private int port;
 
     private RoomModel roomModel;
     private ChatModel chatModel;
 
-    public ServerSocketManager(int port) {
+
+    public ServerSocketController(int port, ThreadGroupController threadGroupController) {
+        this.port = port;
+        this.threadGroupController = threadGroupController;
+
         this.roomModel = new RoomModel();
         this.chatModel = new ChatModel();
-        this.port = port;
     }
 
     public void run() {
@@ -52,12 +58,10 @@ public class ServerSocketManager {
             AppLogger.info(socket.getInetAddress().getHostAddress() + " requested " + requestType);
 
             switch (requestType) {
-                case ROOMLIST ->
-                        new Thread(new ListRoomConnectionThread(socket, roomModel, dto.getRequestMsg())).start();
-                case NEWROOM -> new Thread(new NewRoomConnectionThread(socket, roomModel, dto.getRequestMsg())).start();
-                case CONNECTCHAT -> new Thread(new ConnectChatConnectionThread(socket, chatModel)).start();
-                default ->
-                        AppLogger.error("Unsupported request type " + requestType + "From " + socket.getInetAddress().getHostAddress());
+                case ROOMLIST -> newListRoomThread(socket, dto);
+                case NEWROOM -> newRoomThread(socket, dto);
+                case CONNECTCHAT -> newChatThread(socket, dto);
+                default -> AppLogger.error("Unsupported request type " + requestType);
             }
 
         } catch (ClassNotFoundException e) {
@@ -66,4 +70,19 @@ public class ServerSocketManager {
             socket.close();
         }
     }
+
+    private void newListRoomThread(Socket socket, DTO dto) {
+        new Thread(new ListRoomConnectionThread(socket, roomModel, dto.getRequestMsg())).start();
+    }
+
+    private void newRoomThread(Socket socket, DTO dto) {
+        new Thread(new NewRoomConnectionThread(socket, roomModel, dto.getRequestMsg())).start();
+    }
+
+    private void newChatThread(Socket socket, DTO dto) {
+        Integer chatId = ((ChatConnection) dto.getRequestMsg()).getChatId();
+        ThreadGroup chatGroup = threadGroupController.getOrCreateThreadGroup(chatId);
+        new Thread(chatGroup, new ConnectChatConnectionThread(socket, chatModel, dto.getRequestMsg())).start();
+    }
+
 }

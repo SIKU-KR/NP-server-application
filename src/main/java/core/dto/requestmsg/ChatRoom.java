@@ -1,8 +1,7 @@
-package core.dto;
+package core.dto.requestmsg;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 public class ChatRoom implements Serializable {
     private Integer id;

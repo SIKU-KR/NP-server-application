@@ -1,8 +1,8 @@
 package core.runnable;
 
 import core.common.AppLogger;
-import core.dto.ChatRoom;
-import core.dto.NewRoom;
+import core.dto.requestmsg.ChatRoom;
+import core.dto.requestmsg.NewRoom;
 import core.model.RoomModel;
 
 import java.io.IOException;
@@ -26,10 +26,8 @@ public class NewRoomConnectionThread implements Runnable {
         try {
             ChatRoom createdRoom = getCreatedRoom();
             sendResponse(createdRoom);
-        } catch (RuntimeException e) {
-            AppLogger.error(e.getMessage());
-        } catch (IOException e) {
-            AppLogger.error(e.getMessage());
+        } catch (RuntimeException | IOException e) {
+            AppLogger.error("When sending response: " + e.getMessage());
         } finally {
             closeSocket();
         }
@@ -52,7 +50,7 @@ public class NewRoomConnectionThread implements Runnable {
                 this.socket.close();
             }
         } catch (IOException e) {
-            AppLogger.error(e.getMessage());
+            AppLogger.error("When closing socket: " + e.getMessage());
         }
     }
 }
