@@ -20,21 +20,26 @@ import java.net.Socket;
  */
 public class ServerSocketController {
 
-    private ServerSocket serverSocket;
+    private static ServerSocketController instance;
 
-    private ThreadGroupController threadGroupController;
     private int port;
+    private ServerSocket serverSocket;
 
     private RoomModel roomModel;
     private ChatModel chatModel;
 
 
-    public ServerSocketController(int port, ThreadGroupController threadGroupController) {
+    private ServerSocketController(int port) {
         this.port = port;
-        this.threadGroupController = threadGroupController;
-
         this.roomModel = new RoomModel();
         this.chatModel = new ChatModel();
+    }
+
+    public static ServerSocketController getInstance(int port) {
+        if (instance == null) {
+            instance = new ServerSocketController(port);
+        }
+        return instance;
     }
 
     public void run() {
@@ -81,7 +86,7 @@ public class ServerSocketController {
 
     private void newChatThread(Socket socket, DTO dto) {
         Integer chatId = ((ChatConnection) dto.getRequestMsg()).getChatId();
-        ThreadGroup chatGroup = threadGroupController.getOrCreateThreadGroup(chatId);
+        ThreadGroup chatGroup = ThreadGroupController.getInstance().getOrCreateThreadGroup(chatId);
         new Thread(chatGroup, new ConnectChatConnectionThread(socket, chatModel, dto.getRequestMsg())).start();
     }
 

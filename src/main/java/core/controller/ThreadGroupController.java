@@ -4,10 +4,19 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ThreadGroupController {
+    private static ThreadGroupController instance;
+
     private Map<Integer, ThreadGroup> threadGroups;
 
-    public ThreadGroupController() {
+    private ThreadGroupController() {
         this.threadGroups = new ConcurrentHashMap<>();
+    }
+
+    public static ThreadGroupController getInstance() {
+        if (instance == null) {
+            instance = new ThreadGroupController();
+        }
+        return instance;
     }
 
     public ThreadGroup getOrCreateThreadGroup(Integer chatId) {
