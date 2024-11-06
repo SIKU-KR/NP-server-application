@@ -1,4 +1,4 @@
-package core.dto;
+package core.dto.requestmsg;
 
 import java.io.Serializable;
 

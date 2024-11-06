@@ -4,8 +4,11 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 public class Message implements Serializable {
-    private ChatRoom chat;
-    private User user;
+    private Integer chatId;
+    private Integer userId;
     private String message;
-    private LocalDateTime time;
+
+    public String getMessage() {
+        return message;
+    }
 }

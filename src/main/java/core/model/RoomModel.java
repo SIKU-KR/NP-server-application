@@ -1,7 +1,7 @@
 package core.model;
 
 import core.common.AppLogger;
-import core.dto.ChatRoom;
+import core.dto.requestmsg.ChatRoom;
 
 import java.sql.*;
 import java.time.LocalDateTime;

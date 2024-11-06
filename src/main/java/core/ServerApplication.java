@@ -1,6 +1,7 @@
 package core;
 
-import core.common.AppLogger;
+import core.controller.ServerSocketController;
+import core.controller.ThreadGroupController;
 
 /**
  * Start point of Server Application
@@ -12,8 +13,9 @@ public class ServerApplication {
     private static int PORT = 10001;
 
     public static void main(String[] args) {
-        ServerSocketManager serverSocketManager = new ServerSocketManager(PORT);
-        serverSocketManager.run();
+        ThreadGroupController threadGroupController = new ThreadGroupController();
+        ServerSocketController serverSocketController = new ServerSocketController(PORT, threadGroupController);
+        serverSocketController.run();
     }
 
 }
