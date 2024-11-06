@@ -1,7 +1,6 @@
 package core;
 
 import core.controller.ServerSocketController;
-import core.controller.ThreadGroupController;
 
 /**
  * Start point of Server Application
@@ -10,12 +9,10 @@ import core.controller.ThreadGroupController;
  */
 public class ServerApplication {
 
-    private static int PORT = 10001;
+    private static final int PORT = 10001;
 
     public static void main(String[] args) {
-        ThreadGroupController threadGroupController = new ThreadGroupController();
-        ServerSocketController serverSocketController = new ServerSocketController(PORT, threadGroupController);
-        serverSocketController.run();
+        ServerSocketController.getInstance(PORT).run();
     }
 
 }

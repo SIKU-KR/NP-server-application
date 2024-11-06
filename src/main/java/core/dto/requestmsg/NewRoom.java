@@ -3,8 +3,8 @@ package core.dto.requestmsg;
 import java.io.Serializable;
 
 public class NewRoom implements Serializable {
-    private String creator;
-    private String title;
+    private final String creator;
+    private final String title;
 
     public NewRoom(String creator, String title) {
         this.creator = creator;

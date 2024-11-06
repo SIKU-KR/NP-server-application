@@ -4,10 +4,10 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 public class ChatRoom implements Serializable {
-    private Integer id;
-    private String name;
-    private String creator;
-    private LocalDateTime time;
+    private final Integer id;
+    private final String name;
+    private final String creator;
+    private final LocalDateTime time;
 
     public ChatRoom(Integer id, String name, String creator, LocalDateTime time) {
         this.id = id;
