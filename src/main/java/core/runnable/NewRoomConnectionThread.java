@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+/**
+ * Handler thread for connection to create new room.
+ */
 public class NewRoomConnectionThread implements Runnable {
 
     private final Socket socket;

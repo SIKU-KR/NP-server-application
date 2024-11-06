@@ -1,6 +1,8 @@
 package core.runnable;
 
 import core.common.AppLogger;
+import core.common.MsgQueue;
+import core.controller.ChatThreadsController;
 import core.dto.requestmsg.ChatConnection;
 import core.dto.Message;
 import core.model.ChatModel;
@@ -8,6 +10,11 @@ import core.model.ChatModel;
 import java.io.*;
 import java.net.Socket;
 
+/**
+ * Thread of chat sessions
+ * 1. read msg object from input stream (client -> server)
+ * 2. write msg object using output stream (server -> client)
+ */
 public class ConnectChatConnectionThread implements Runnable {
 
     private final Socket socket;
@@ -48,6 +55,10 @@ public class ConnectChatConnectionThread implements Runnable {
         }
     }
 
+    public Integer getUserId() {
+        return userId;
+    }
+
     private void readMessage(ObjectInputStream objectInputStream) {
         try {
             Message receivedMessage = (Message) objectInputStream.readObject();
@@ -61,6 +72,7 @@ public class ConnectChatConnectionThread implements Runnable {
     private void processMessage(Message message) {
         if (message != null) {
             chatModel.createNewMsg(chatId, userId, message.getMessage());
+            MsgQueue.getInstance().enqueue(message);
         }
     }
 
@@ -75,8 +87,9 @@ public class ConnectChatConnectionThread implements Runnable {
 
     public void stop() {
         running = false;
+        ChatThreadsController.getInstance().removeThread(chatId, this);
         try {
-            if(!socket.isClosed()) {
+            if (!socket.isClosed()) {
                 socket.close();
             }
         } catch (IOException e) {
@@ -84,3 +97,5 @@ public class ConnectChatConnectionThread implements Runnable {
         }
     }
 }
+
+

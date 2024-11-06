@@ -10,8 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * RoomModel inherits DBConnection(Abstract Class)
- * 1. readRoomList method excutes a query to read all chat rooms sorted by timestamp
+ * Access to Chat table in MySQL dbms.
  */
 public class RoomModel extends DBConnection{
 
