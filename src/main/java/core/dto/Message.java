@@ -5,10 +5,13 @@ import java.io.Serializable;
 /**
  * Message transfer object for chatting mechanism
  */
-public class Message implements Serializable {
+public class Message {
     private Integer chatId;
     private Integer userId;
     private String message;
+
+    public Message() {
+    }
 
     public Integer getChatId() {
         return chatId;

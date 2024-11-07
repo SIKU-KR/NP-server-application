@@ -1,7 +1,7 @@
 package core.model;
 
 import core.common.AppLogger;
-import core.dto.requestmsg.ChatRoom;
+import core.dto.response.ChatRoom;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -16,7 +16,7 @@ public class RoomModel extends DBConnection{
 
     public List<ChatRoom> readRoomList() {
         List<ChatRoom> roomList = new ArrayList<>();
-        String sql = "SELECT * FROM `Chat Order By timestamp";
+        String sql = "SELECT * FROM Chat Order By timestamp";
         List<Map<String, Object>> result = executeQuery(sql);
         for (Map<String, Object> row : result) {
             Integer id = (Integer) row.get("id");
@@ -55,6 +55,23 @@ public class RoomModel extends DBConnection{
         } catch (SQLException e) {
             AppLogger.error(e.getMessage());
             throw new RuntimeException("Database error occurred while creating a new room.");
+        }
+    }
+
+    public void removeRoomForTest(String roomName) {
+        String sql = "DELETE FROM Chat WHERE title = ?";
+        try (Connection connection = getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, roomName);
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows == 0) {
+                AppLogger.warn("No room found with title: " + roomName);
+            } else {
+                AppLogger.info("Room with title '" + roomName + "' deleted successfully.");
+            }
+        } catch (SQLException e) {
+            AppLogger.error("Error occurred while deleting room: " + e.getMessage());
+            throw new RuntimeException("Database error occurred while deleting the room.");
         }
     }
 }

@@ -2,9 +2,12 @@ package core.dto.requestmsg;
 
 import java.io.Serializable;
 
-public class NewRoom implements Serializable {
-    private final String creator;
-    private final String title;
+public class NewRoom {
+    private String creator;
+    private String title;
+
+    public NewRoom() {
+    }
 
     public NewRoom(String creator, String title) {
         this.creator = creator;

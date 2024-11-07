@@ -1,5 +1,6 @@
 package core.controller;
 
+import com.google.gson.JsonSyntaxException;
 import core.common.AppLogger;
 import core.common.RequestType;
 import core.dto.requestmsg.ChatConnection;
@@ -9,9 +10,9 @@ import core.model.RoomModel;
 import core.runnable.ConnectChatConnectionThread;
 import core.runnable.ListRoomConnectionThread;
 import core.runnable.NewRoomConnectionThread;
+import core.view.InStreamView;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -45,6 +46,18 @@ public class ServerSocketController {
         return instance;
     }
 
+    // method for test
+    public static void stopServer() {
+        try {
+            if (instance.serverSocket != null) {
+                instance.serverSocket.close();
+                instance = null;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void run() {
         try {
             this.serverSocket = new ServerSocket(port);
@@ -60,8 +73,9 @@ public class ServerSocketController {
     }
 
     private void connectionHandler(Socket socket) throws IOException {
-        try (ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream())) {
-            DTO dto = (DTO) objectInputStream.readObject();
+        try {
+            InStreamView<DTO> in = new InStreamView<>(socket, DTO.class);
+            DTO dto = in.readDTO();
             RequestType requestType = dto.getRequestType();
             AppLogger.info(socket.getInetAddress().getHostAddress() + " requested " + requestType);
 
@@ -72,10 +86,10 @@ public class ServerSocketController {
                 default -> AppLogger.error("Unsupported request type " + requestType);
             }
 
-        } catch (ClassNotFoundException e) {
-            AppLogger.error(e.getMessage());
-        } finally {
-            socket.close();
+        } catch (IOException e) {
+            AppLogger.error("Class is not founded: " + e.getMessage());
+        } catch (JsonSyntaxException e) {
+            AppLogger.error("Wrong format of DTO " + e.getMessage());
         }
     }
 
@@ -93,5 +107,4 @@ public class ServerSocketController {
         ChatThreadsController.getInstance().addThread(chatId, connectChatConnectionThread);
         new Thread(connectChatConnectionThread).start();
     }
-
 }
