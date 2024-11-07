@@ -1,9 +1,10 @@
 package core.runnable;
 
 import core.common.AppLogger;
-import core.dto.requestmsg.ChatRoom;
+import core.dto.response.ChatRoom;
 import core.dto.requestmsg.NewRoom;
 import core.model.RoomModel;
+import core.view.OutStreamView;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -16,7 +17,7 @@ public class NewRoomConnectionThread implements Runnable {
 
     private final Socket socket;
     private final RoomModel roomModel;
-    private final NewRoom requestMsg;
+    private NewRoom requestMsg;
 
     public NewRoomConnectionThread(Socket socket, RoomModel roomModel, Object requestMsg) {
         this.socket = socket;
@@ -41,10 +42,8 @@ public class NewRoomConnectionThread implements Runnable {
     }
 
     private void sendResponse(ChatRoom response) throws IOException {
-        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream())) {
-            objectOutputStream.writeObject(response);
-            objectOutputStream.flush();
-        }
+        OutStreamView<ChatRoom> out = new OutStreamView<>(socket);
+        out.send(response);
     }
 
     private void closeSocket() {

@@ -1,13 +1,13 @@
 CREATE TABLE User
 (
-    id    INT PRIMARY KEY,
+    id    INT PRIMARY KEY AUTO_INCREMENT,
     name  VARCHAR(255),
     score INT
 );
 
 CREATE TABLE Chat
 (
-    id        INT PRIMARY KEY,
+    id        INT PRIMARY KEY AUTO_INCREMENT,
     title     VARCHAR(255),
     creator   VARCHAR(255),
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -15,7 +15,7 @@ CREATE TABLE Chat
 
 CREATE TABLE Message
 (
-    id        INT PRIMARY KEY,
+    id        INT PRIMARY KEY AUTO_INCREMENT,
     text      VARCHAR(255),
     chat_id   INT,
     user_id   INT,

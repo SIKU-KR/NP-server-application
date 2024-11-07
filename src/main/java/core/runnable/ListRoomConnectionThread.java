@@ -1,11 +1,12 @@
 package core.runnable;
 
 import core.common.AppLogger;
-import core.dto.requestmsg.ChatRoom;
+import core.dto.response.ChatRoom;
+import core.dto.response.ListChatRoom;
 import core.model.RoomModel;
+import core.view.OutStreamView;
 
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.List;
 
@@ -16,16 +17,15 @@ public class ListRoomConnectionThread implements Runnable {
 
     private final Socket socket;
     private final RoomModel roomModel;
-    private final Object requestMsg;
 
     public ListRoomConnectionThread(Socket socket, RoomModel roomModel, Object requestMsg) {
         this.socket = socket;
         this.roomModel = roomModel;
-        this.requestMsg = requestMsg;
     }
 
     @Override
     public void run() {
+
         try {
             sendRoomList(getRoomList());
         } catch (IOException e) {
@@ -35,14 +35,18 @@ public class ListRoomConnectionThread implements Runnable {
         }
     }
 
-    private List<ChatRoom> getRoomList() {
-        return roomModel.readRoomList();
+    private ListChatRoom getRoomList() {
+        List<ChatRoom> response =  roomModel.readRoomList();
+        return new ListChatRoom(response);
     }
 
-    private void sendRoomList(List<ChatRoom> response) throws IOException {
-        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream())) {
-            objectOutputStream.writeObject(response);
-            objectOutputStream.flush();
+    private void sendRoomList(ListChatRoom response) throws IOException {
+        try {
+            OutStreamView<ListChatRoom> out = new OutStreamView<>(socket);
+            out.send(response);
+            AppLogger.debug("Room list sent successfully");
+        } catch (IOException e) {
+            AppLogger.error("IOException when sending room list: " + e.getMessage());
         }
     }
 

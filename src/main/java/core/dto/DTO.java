@@ -9,10 +9,12 @@ import java.io.Serializable;
  * 1. RequestType : Enum type value (core/common/RequestType.java)
  * 2. RequestMsg : RequestMsgs as an object (core/dto/*)
  */
-public class DTO implements Serializable {
+public class DTO {
+    RequestType requestType;
+    Object requestMsg;
 
-    private final RequestType requestType;
-    private final Object requestMsg;
+    public DTO() {
+    }
 
     public DTO(RequestType requestType, Object requestMsg) {
         this.requestType = requestType;
