@@ -61,14 +61,14 @@ public class ServerSocketController {
     public void run() {
         try {
             this.serverSocket = new ServerSocket(port);
-            System.out.println("Server started on port " + port);
+            AppLogger.formalInfo(serverSocket, "SERVER-STARTED", "server started");
             while (true) {
                 Socket socket = serverSocket.accept();
-                AppLogger.info("Connected from " + socket.getInetAddress().getHostAddress());
+                AppLogger.formalInfo(socket, "CONNECTED", "client connected to server");
                 connectionHandler(socket);
             }
         } catch (IOException e) {
-            AppLogger.error(e.getMessage());
+            AppLogger.formalError(serverSocket.getInetAddress().getHostAddress(), serverSocket.getLocalPort(), "SERVER-CLOSED", e.getMessage());
         }
     }
 
@@ -77,19 +77,17 @@ public class ServerSocketController {
             InStreamView<DTO> in = new InStreamView<>(socket, DTO.class);
             DTO dto = in.readDTO();
             RequestType requestType = dto.getRequestType();
-            AppLogger.info(socket.getInetAddress().getHostAddress() + " requested " + requestType);
+            AppLogger.formalInfo(socket, "REQUEST", "Requested " + requestType);
 
             switch (requestType) {
                 case ROOMLIST -> newListRoomThread(socket, dto);
                 case NEWROOM -> newRoomThread(socket, dto);
                 case CONNECTCHAT -> newChatThread(socket, dto);
-                default -> AppLogger.error("Unsupported request type " + requestType);
+                default -> AppLogger.formalError(socket.getInetAddress().getHostAddress(), socket.getPort(), "UNSUPPORTED-REQUEST", requestType.name());
             }
 
-        } catch (IOException e) {
-            AppLogger.error("Class is not founded: " + e.getMessage());
-        } catch (JsonSyntaxException e) {
-            AppLogger.error("Wrong format of DTO " + e.getMessage());
+        } catch (IOException | JsonSyntaxException e) {
+            AppLogger.formalError(socket, e);
         }
     }
 

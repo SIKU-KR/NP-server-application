@@ -6,6 +6,8 @@ import core.controller.ChatThreadsController;
 import core.dto.requestmsg.ChatConnection;
 import core.dto.Message;
 import core.model.ChatModel;
+import core.view.InStreamView;
+import core.view.OutStreamView;
 
 import java.io.*;
 import java.net.Socket;
@@ -22,8 +24,8 @@ public class ConnectChatConnectionThread implements Runnable {
     private final Integer chatId;
     private final Integer userId;
 
-    private InputStream inputStream;
-    private OutputStream outputStream;
+    private InStreamView<Message> in;
+    private OutStreamView<Message> out;
     private volatile boolean running = true;
 
     public ConnectChatConnectionThread(Socket socket, ChatModel chatModel, Object requestMsg) {
@@ -37,21 +39,24 @@ public class ConnectChatConnectionThread implements Runnable {
 
     private void initializeStreams() {
         try {
-            this.inputStream = this.socket.getInputStream();
-            this.outputStream = this.socket.getOutputStream();
-        } catch (IOException e) {
-            AppLogger.error("When initializing streams: " + e.getMessage());
+            this.in = new InStreamView<>(socket, Message.class);
+            this.out = new OutStreamView<>(socket);
+        } catch (Exception e) {
+            AppLogger.formalError(socket, e);
         }
     }
 
     @Override
     public void run() {
-        try (ObjectInputStream objectInputStream = new ObjectInputStream(inputStream)) {
+        AppLogger.formalInfo(socket, "STARTED", "started chatThread on chatId:" + chatId + ", userId:" + userId);
+        try {
             while (running) {
-                readMessage(objectInputStream);
+                Message msg = in.read();
+                processMessage(msg);
             }
-        } catch (IOException e) {
-            AppLogger.error("When creating ObjectInputStream: " + e.getMessage());
+        } catch (Exception e) {
+            AppLogger.formalError(socket, e);
+            stop();
         }
     }
 
@@ -59,30 +64,21 @@ public class ConnectChatConnectionThread implements Runnable {
         return userId;
     }
 
-    private void readMessage(ObjectInputStream objectInputStream) {
-        try {
-            Message receivedMessage = (Message) objectInputStream.readObject();
-            processMessage(receivedMessage);
-        } catch (ClassNotFoundException | IOException e) {
-            AppLogger.error("When reading message: " + e.getMessage());
-            stop();
-        }
+    public Socket getSocket() {
+        return socket;
     }
 
     private void processMessage(Message message) {
         if (message != null) {
-            chatModel.createNewMsg(chatId, userId, message.getMessage());
+            AppLogger.formalInfo(socket, "RECEIVED", "message: '" + message.getMessage() + "'");
+//            chatModel.createNewMsg(chatId, userId, message.getMessage());
             MsgQueue.getInstance().enqueue(message);
         }
     }
 
     public synchronized void sendMessage(Message message) {
-        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream)) {
-            objectOutputStream.writeObject(message);
-            objectOutputStream.flush();
-        } catch (IOException e) {
-            AppLogger.error("When sending message: " + e.getMessage());
-        }
+        AppLogger.formalInfo(socket, "SENT", "message: '" + message.getMessage() + "'");
+        out.send(message);
     }
 
     public void stop() {

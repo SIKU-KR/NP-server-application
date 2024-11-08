@@ -13,6 +13,12 @@ public class Message {
     public Message() {
     }
 
+    public Message(Integer chatId, Integer userId, String message) {
+        this.chatId = chatId;
+        this.userId = userId;
+        this.message = message;
+    }
+
     public Integer getChatId() {
         return chatId;
     }
@@ -23,5 +29,14 @@ public class Message {
 
     public String getMessage() {
         return message;
+    }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "chatId=" + chatId +
+                ", userId=" + userId +
+                ", message='" + message + '\'' +
+                '}';
     }
 }

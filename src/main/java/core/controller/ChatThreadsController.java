@@ -1,5 +1,6 @@
 package core.controller;
 
+import core.common.AppLogger;
 import core.runnable.ConnectChatConnectionThread;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class ChatThreadsController {
     }
 
     public List<ConnectChatConnectionThread> getThreads(Integer chatId) {
-        return chatConnections.getOrDefault(chatId, List.of());
+        return this.chatConnections.getOrDefault(chatId, List.of());
     }
 
     public void removeThread(Integer chatId, ConnectChatConnectionThread connectionThread) {

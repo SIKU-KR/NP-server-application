@@ -38,9 +38,14 @@ public class MsgQueue {
 
     public void enqueue(Message message) {
         queue.add(message);
+        AppLogger.info("Task appended to queue: " + message.toString());
     }
 
     public Message dequeue() throws InterruptedException {
         return queue.take();
+    }
+
+    public void clear() {
+        instance = null;
     }
 }
