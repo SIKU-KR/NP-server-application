@@ -1,7 +1,6 @@
 CREATE TABLE User
 (
-    id    INT PRIMARY KEY AUTO_INCREMENT,
-    name  VARCHAR(255),
+    name  VARCHAR(255) PRIMARY KEY,
     score INT
 );
 
@@ -10,7 +9,8 @@ CREATE TABLE Chat
     id        INT PRIMARY KEY AUTO_INCREMENT,
     title     VARCHAR(255),
     creator   VARCHAR(255),
-    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (creator) REFERENCES User (name)
 );
 
 CREATE TABLE Message
@@ -18,8 +18,8 @@ CREATE TABLE Message
     id        INT PRIMARY KEY AUTO_INCREMENT,
     text      VARCHAR(255),
     chat_id   INT,
-    user_id   INT,
+    user_name VARCHAR(255),
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (chat_id) REFERENCES Chat (id) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES User (id) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (chat_id) REFERENCES Chat (id),
+    FOREIGN KEY (user_name) REFERENCES User (name)
 );

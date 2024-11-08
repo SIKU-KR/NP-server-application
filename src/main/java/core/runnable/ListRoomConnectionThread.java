@@ -29,14 +29,14 @@ public class ListRoomConnectionThread implements Runnable {
         try {
             sendRoomList(getRoomList());
         } catch (IOException e) {
-            AppLogger.error("When sending room list: " + e.getMessage());
+            AppLogger.formalError(socket, e);
         } finally {
             closeSocket();
         }
     }
 
     private ListChatRoom getRoomList() {
-        List<ChatRoom> response =  roomModel.readRoomList();
+        List<ChatRoom> response = roomModel.readRoomList();
         return new ListChatRoom(response);
     }
 
@@ -44,19 +44,19 @@ public class ListRoomConnectionThread implements Runnable {
         try {
             OutStreamView<ListChatRoom> out = new OutStreamView<>(socket);
             out.send(response);
-            AppLogger.debug("Room list sent successfully");
+            AppLogger.formalInfo(socket, "RESPONSE", "Room list sent successfully");
         } catch (IOException e) {
-            AppLogger.error("IOException when sending room list: " + e.getMessage());
+            AppLogger.formalError(socket, e);
         }
     }
 
     private void closeSocket() {
         try {
-            if(!socket.isClosed()) {
+            if (!socket.isClosed()) {
                 socket.close();
             }
         } catch (IOException e) {
-            AppLogger.error("When closing socket: " + e.getMessage());
+            AppLogger.formalError(socket, e);
         }
     }
 }

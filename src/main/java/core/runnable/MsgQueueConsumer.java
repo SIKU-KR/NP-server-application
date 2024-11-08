@@ -16,21 +16,25 @@ public class MsgQueueConsumer implements Runnable {
 
     private MsgQueue msgQueue;
     private ChatThreadsController chatThreadsController;
+    private boolean isRunning = true;
 
     public MsgQueueConsumer() {
         this.msgQueue = MsgQueue.getInstance();
         this.chatThreadsController = ChatThreadsController.getInstance();
+        AppLogger.info("MsgQueueConsumer started");
     }
 
     @Override
     public void run() {
-        while (true) {
-            try{
+        while (isRunning) {
+            try {
                 Message msg = this.msgQueue.dequeue();
+                AppLogger.info("Task taken from queue :" + msg.toString());
                 msgHandler(msg);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                AppLogger.error("Consumer Thread Interrupted" + e.getMessage());
+                AppLogger.error("Consumer Thread Interrupted");
+                break;
             }
         }
     }
@@ -43,6 +47,7 @@ public class MsgQueueConsumer implements Runnable {
         for (ConnectChatConnectionThread thread : threads) {
             if (!thread.getUserId().equals(sendedBy)) {
                 thread.sendMessage(msg);
+                AppLogger.formalInfo(thread.getSocket(), "MESSAGE SENT", "Message sent to user " + thread.getUserId() + " in chat " + chatId);
             }
         }
     }

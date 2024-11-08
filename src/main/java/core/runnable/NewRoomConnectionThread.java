@@ -31,7 +31,7 @@ public class NewRoomConnectionThread implements Runnable {
             ChatRoom createdRoom = getCreatedRoom();
             sendResponse(createdRoom);
         } catch (RuntimeException | IOException e) {
-            AppLogger.error("When sending response: " + e.getMessage());
+            AppLogger.formalError(socket, e);
         } finally {
             closeSocket();
         }
@@ -44,6 +44,7 @@ public class NewRoomConnectionThread implements Runnable {
     private void sendResponse(ChatRoom response) throws IOException {
         OutStreamView<ChatRoom> out = new OutStreamView<>(socket);
         out.send(response);
+        AppLogger.formalInfo(socket, "RESPONSE", "New room created successfully");
     }
 
     private void closeSocket() {
@@ -52,7 +53,7 @@ public class NewRoomConnectionThread implements Runnable {
                 this.socket.close();
             }
         } catch (IOException e) {
-            AppLogger.error("When closing socket: " + e.getMessage());
+            AppLogger.formalError(socket, e);
         }
     }
 }
