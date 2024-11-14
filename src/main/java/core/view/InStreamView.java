@@ -9,6 +9,7 @@ import core.common.RequestType;
 import core.dto.DTO;
 import core.dto.requestmsg.ChatConnection;
 import core.dto.requestmsg.NewRoom;
+import core.dto.requestmsg.UserLogin;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -41,6 +42,7 @@ public class InStreamView<T> {
         switch (requestType) {
             case NEWROOM -> requestMsg = gson.fromJson(jsonObject.get("requestMsg"), NewRoom.class);
             case CONNECTCHAT -> requestMsg = gson.fromJson(jsonObject.get("requestMsg"), ChatConnection.class);
+            case LOGIN -> requestMsg = gson.fromJson(jsonObject.get("requestMsg"), UserLogin.class);
         }
         return new DTO(requestType, requestMsg);
     }

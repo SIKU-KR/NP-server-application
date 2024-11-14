@@ -1,6 +1,4 @@
-package core.model;
-
-import core.common.AppLogger;
+package core.common;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -59,3 +57,4 @@ public abstract class DBConnection {
         return DriverManager.getConnection(url, user, password);
     }
 }
+

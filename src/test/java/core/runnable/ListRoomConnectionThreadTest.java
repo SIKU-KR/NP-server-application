@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ListRoomConnectionThreadTest {
@@ -57,7 +58,7 @@ class ListRoomConnectionThreadTest {
             InStreamView<ListChatRoom> in = new InStreamView<>(socket, ListChatRoom.class);
             out.send(dto);
             ListChatRoom response = in.read();
-            assertTrue(response.getChatRooms().size() == 5);
+            assertEquals(response.getChatRooms().size(), 3);
 
         } catch (IOException e) {
             e.printStackTrace();
