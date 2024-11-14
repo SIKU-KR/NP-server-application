@@ -1,5 +1,6 @@
 package core.model;
 
+import core.common.DBConnection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

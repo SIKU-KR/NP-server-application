@@ -7,9 +7,11 @@ import core.dto.requestmsg.ChatConnection;
 import core.dto.DTO;
 import core.model.ChatModel;
 import core.model.RoomModel;
+import core.model.UserModel;
 import core.runnable.ConnectChatConnectionThread;
 import core.runnable.ListRoomConnectionThread;
 import core.runnable.NewRoomConnectionThread;
+import core.runnable.UserConncectionThread;
 import core.view.InStreamView;
 
 import java.io.IOException;
@@ -31,12 +33,14 @@ public class ServerSocketController {
 
     private final RoomModel roomModel;
     private final ChatModel chatModel;
+    private final UserModel userModel;
 
 
     private ServerSocketController(int port) {
         this.port = port;
         this.roomModel = new RoomModel();
         this.chatModel = new ChatModel();
+        this.userModel = new UserModel();
     }
 
     public static ServerSocketController getInstance(int port) {
@@ -83,6 +87,7 @@ public class ServerSocketController {
                 case ROOMLIST -> newListRoomThread(socket, dto);
                 case NEWROOM -> newRoomThread(socket, dto);
                 case CONNECTCHAT -> newChatThread(socket, dto);
+                case LOGIN -> loginThread(socket, dto);
                 default -> AppLogger.formalError(socket.getInetAddress().getHostAddress(), socket.getPort(), "UNSUPPORTED-REQUEST", requestType.name());
             }
 
@@ -104,5 +109,9 @@ public class ServerSocketController {
         ConnectChatConnectionThread connectChatConnectionThread = new ConnectChatConnectionThread(socket, chatModel, dto.getRequestMsg());
         ChatThreadsController.getInstance().addThread(chatId, connectChatConnectionThread);
         new Thread(connectChatConnectionThread).start();
+    }
+
+    private void loginThread(Socket socket, DTO dto) {
+        new Thread(new UserConncectionThread(socket, userModel, dto.getRequestMsg())).start();
     }
 }

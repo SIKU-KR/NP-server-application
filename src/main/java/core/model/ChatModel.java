@@ -1,6 +1,7 @@
 package core.model;
 
 import core.common.AppLogger;
+import core.common.DBConnection;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

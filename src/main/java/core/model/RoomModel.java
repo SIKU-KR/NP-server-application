@@ -1,6 +1,7 @@
 package core.model;
 
 import core.common.AppLogger;
+import core.common.DBConnection;
 import core.dto.response.ChatRoom;
 
 import java.sql.*;
@@ -12,7 +13,7 @@ import java.util.Map;
 /**
  * Access to Chat table in MySQL dbms.
  */
-public class RoomModel extends DBConnection{
+public class RoomModel extends DBConnection {
 
     public List<ChatRoom> readRoomList() {
         List<ChatRoom> roomList = new ArrayList<>();
