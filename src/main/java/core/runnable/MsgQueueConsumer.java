@@ -41,13 +41,13 @@ public class MsgQueueConsumer implements Runnable {
 
     private void msgHandler(Message msg) {
         Integer chatId = msg.getChatId();
-        Integer sendedBy = msg.getUserId();
+        String sendedBy = msg.getUsername();
         List<ConnectChatConnectionThread> threads = this.chatThreadsController.getThreads(chatId);
 
         for (ConnectChatConnectionThread thread : threads) {
-            if (!thread.getUserId().equals(sendedBy)) {
+            if (!thread.getUsername().equals(sendedBy)) {
                 thread.sendMessage(msg);
-                AppLogger.formalInfo(thread.getSocket(), "MESSAGE SENT", "Message sent to user " + thread.getUserId() + " in chat " + chatId);
+                AppLogger.formalInfo(thread.getSocket(), "MESSAGE SENT", "Message sent to user " + thread.getUsername() + " in chat " + chatId);
             }
         }
     }

@@ -31,9 +31,9 @@ class ConnectChatConnectionThreadTest {
 
     ChatThreadsController chatThreadsController;
 
-    ChatConnection chco1 = new ChatConnection(1, chatId);
-    ChatConnection chco2 = new ChatConnection(2, chatId);
-    ChatConnection chco3 = new ChatConnection(3, chatId);
+    ChatConnection chco1 = new ChatConnection("1", chatId);
+    ChatConnection chco2 = new ChatConnection("2", chatId);
+    ChatConnection chco3 = new ChatConnection("3", chatId);
 
     @BeforeEach
     void setUp() throws InterruptedException, IOException {
@@ -126,7 +126,7 @@ class ConnectChatConnectionThreadTest {
 
             // 메시지 보내는 쪽
             ConnectChatConnectionThread th1 = chatThreadsController.getThreads(chatId).get(0);
-            th1.sendMessage(new Message(chco1.getChatId(), chco1.getUserId(), "Test message"));
+            th1.sendMessage(new Message(chco1.getChatId(), chco1.getUsername(), "Test message"));
             Thread.sleep(100);
 
             // 메시지 읽는쪽
@@ -135,7 +135,7 @@ class ConnectChatConnectionThreadTest {
 
             // 테스트 케이스
             assertEquals(chco1.getChatId(), msg.getChatId());
-            assertEquals(chco1.getUserId(), msg.getUserId());
+            assertEquals(chco1.getUsername(), msg.getUsername());
             assertEquals("Test message", msg.getMessage());
         }
     }
@@ -157,14 +157,14 @@ class ConnectChatConnectionThreadTest {
 
             // 메시지 보내기
             OutStreamView<Message> msgOut = new OutStreamView<>(sc1);
-            msgOut.send(new Message(chco1.getChatId(), chco1.getUserId(), "Test message"));
+            msgOut.send(new Message(chco1.getChatId(), chco1.getUsername(), "Test message"));
             Thread.sleep(100);
 
             // 메시지 수신하기
             InStreamView<Message> in1 = new InStreamView<>(sc2, Message.class);
             Message msg = in1.read();
             assertEquals(chco1.getChatId(), msg.getChatId());
-            assertEquals(chco1.getUserId(), msg.getUserId());
+            assertEquals(chco1.getUsername(), msg.getUsername());
             assertEquals("Test message", msg.getMessage());
         }
     }
@@ -191,21 +191,21 @@ class ConnectChatConnectionThreadTest {
 
             // 메시지 보내기
             OutStreamView<Message> msgOut = new OutStreamView<>(sc1);
-            msgOut.send(new Message(chco1.getChatId(), chco1.getUserId(), "Test message"));
+            msgOut.send(new Message(chco1.getChatId(), chco1.getUsername(), "Test message"));
             Thread.sleep(100);
 
             // 메시지 수신하기
             InStreamView<Message> in1 = new InStreamView<>(sc2, Message.class);
             Message msg = in1.read();
             assertEquals(chco1.getChatId(), msg.getChatId());
-            assertEquals(chco1.getUserId(), msg.getUserId());
+            assertEquals(chco1.getUsername(), msg.getUsername());
             assertEquals("Test message", msg.getMessage());
 
             // 메시지 수신하기
             InStreamView<Message> in2 = new InStreamView<>(sc3, Message.class);
             Message msg2 = in2.read();
             assertEquals(chco1.getChatId(), msg2.getChatId());
-            assertEquals(chco1.getUserId(), msg2.getUserId());
+            assertEquals(chco1.getUsername(), msg2.getUsername());
             assertEquals("Test message", msg2.getMessage());
         }
     }

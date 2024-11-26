@@ -7,15 +7,15 @@ import java.io.Serializable;
  */
 public class Message {
     private Integer chatId;
-    private Integer userId;
+    private String username;
     private String message;
 
     public Message() {
     }
 
-    public Message(Integer chatId, Integer userId, String message) {
+    public Message(Integer chatId, String username, String message) {
         this.chatId = chatId;
-        this.userId = userId;
+        this.username = username;
         this.message = message;
     }
 
@@ -23,20 +23,11 @@ public class Message {
         return chatId;
     }
 
-    public Integer getUserId() {
-        return userId;
+    public String getUsername() {
+        return username;
     }
 
     public String getMessage() {
         return message;
-    }
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "chatId=" + chatId +
-                ", userId=" + userId +
-                ", message='" + message + '\'' +
-                '}';
     }
 }

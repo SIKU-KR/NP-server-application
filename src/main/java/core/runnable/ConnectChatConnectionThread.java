@@ -11,6 +11,7 @@ import core.view.OutStreamView;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.List;
 
 /**
  * Thread of chat sessions
@@ -22,7 +23,7 @@ public class ConnectChatConnectionThread implements Runnable {
     private final Socket socket;
     private final ChatModel chatModel;
     private final Integer chatId;
-    private final Integer userId;
+    private final String username;
 
     private InStreamView<Message> in;
     private OutStreamView<Message> out;
@@ -33,7 +34,7 @@ public class ConnectChatConnectionThread implements Runnable {
         this.chatModel = chatModel;
         ChatConnection chatConnection = (ChatConnection) requestMsg;
         this.chatId = chatConnection.getChatId();
-        this.userId = chatConnection.getUserId();
+        this.username = chatConnection.getUsername();
         initializeStreams();
     }
 
@@ -48,8 +49,12 @@ public class ConnectChatConnectionThread implements Runnable {
 
     @Override
     public void run() {
-        AppLogger.formalInfo(socket, "STARTED", "started chatThread on chatId:" + chatId + ", userId:" + userId);
+        AppLogger.formalInfo(socket, "STARTED", "started chatThread on chatId:" + chatId + ", user:" + username);
         try {
+            List<Message> msgs = this.chatModel.getOldMsgs(chatId);
+            for (Message msg : msgs) {
+                sendMessage(msg);
+            }
             while (running) {
                 Message msg = in.read();
                 processMessage(msg);
@@ -60,8 +65,8 @@ public class ConnectChatConnectionThread implements Runnable {
         }
     }
 
-    public Integer getUserId() {
-        return userId;
+    public String getUsername() {
+        return username;
     }
 
     public Socket getSocket() {
@@ -71,7 +76,7 @@ public class ConnectChatConnectionThread implements Runnable {
     private void processMessage(Message message) {
         if (message != null) {
             AppLogger.formalInfo(socket, "RECEIVED", "message: '" + message.getMessage() + "'");
-//            chatModel.createNewMsg(chatId, userId, message.getMessage());
+            chatModel.createNewMsg(chatId, username, message.getMessage());
             MsgQueue.getInstance().enqueue(message);
         }
     }
