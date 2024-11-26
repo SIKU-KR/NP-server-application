@@ -3,22 +3,22 @@ package core.dto.requestmsg;
 import java.io.Serializable;
 
 public class ChatConnection {
-    private Integer userId;
     private Integer chatId;
+    private String username;
 
     public ChatConnection() {
     }
 
-    public ChatConnection(Integer userId, Integer chatId) {
-        this.userId = userId;
+    public ChatConnection(String username, Integer chatId) {
         this.chatId = chatId;
-    }
-
-    public Integer getUserId() {
-        return userId;
+        this.username = username;
     }
 
     public Integer getChatId() {
         return chatId;
+    }
+
+    public String getUsername() {
+        return username;
     }
 }

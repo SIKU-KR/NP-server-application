@@ -6,14 +6,24 @@
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %msg%n"/>
         </Console>
 
-        <!-- File Appender -->
+        <!-- File Appender for Application Logs -->
         <File name="FileLogger" fileName="logs/application.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %msg%n"/>
+        </File>
+
+        <!-- File Appender for Test Logs -->
+        <File name="TestLogger" fileName="logs/test.log">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %msg%n"/>
         </File>
     </Appenders>
 
     <Loggers>
-        <!-- Root Logger -->
+        <!-- Logger for Test Classes -->
+        <Logger name="core" level="all" additivity="false">
+            <AppenderRef ref="TestLogger"/>
+        </Logger>
+
+        <!-- Root Logger for Application Logs -->
         <Root level="info">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="FileLogger"/>
