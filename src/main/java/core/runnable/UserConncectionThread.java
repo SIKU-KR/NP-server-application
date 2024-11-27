@@ -31,6 +31,7 @@ public class UserConncectionThread implements Runnable {
                 String username = requestMsg.getUsername();
                 userModel.createUser(username);
                 userOptional = Optional.of(new User(username, 0));
+                AppLogger.formalInfo(socket, "CREATED", "New user created: " + username);
             }
             user = userOptional.get();
             sendResponse(user);
