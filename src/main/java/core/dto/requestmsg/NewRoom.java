@@ -1,7 +1,5 @@
 package core.dto.requestmsg;
 
-import java.io.Serializable;
-
 public class NewRoom {
     private String creator;
     private String title;

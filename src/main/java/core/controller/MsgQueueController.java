@@ -1,5 +1,6 @@
-package core.common;
+package core.controller;
 
+import core.common.AppLogger;
 import core.dto.Message;
 
 import java.util.concurrent.BlockingQueue;
@@ -14,23 +15,23 @@ import java.util.concurrent.LinkedBlockingQueue;
  * 2. Also implemented based on Singleton Pattern.
  * 3. BlockingQueue : Specific Queue Collection(java.util.concurrent) for multi-threading.
  */
-public class MsgQueue {
-    private static volatile MsgQueue instance;
+public class MsgQueueController {
+    private static volatile MsgQueueController instance;
 
     private final BlockingQueue<Message> queue;
 
-    private MsgQueue() {
+    private MsgQueueController() {
         this.queue = new LinkedBlockingQueue<>();
     }
 
-    public static MsgQueue getInstance() {
+    public static MsgQueueController getInstance() {
         if (instance != null) {
             return instance;
         }
 
-        synchronized (MsgQueue.class) {
+        synchronized (MsgQueueController.class) {
             if (instance == null) {
-                instance = new MsgQueue();
+                instance = new MsgQueueController();
             }
         }
         return instance;

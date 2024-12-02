@@ -30,4 +30,13 @@ public class Message {
     public String getMessage() {
         return message;
     }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "chatId=" + chatId +
+                ", username='" + username + '\'' +
+                ", message='" + message + '\'' +
+                '}';
+    }
 }

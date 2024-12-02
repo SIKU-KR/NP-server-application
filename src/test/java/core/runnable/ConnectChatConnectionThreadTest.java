@@ -1,6 +1,6 @@
 package core.runnable;
 
-import core.common.MsgQueue;
+import core.controller.MsgQueueController;
 import core.common.RequestType;
 import core.controller.ChatThreadsController;
 import core.controller.ServerSocketController;
@@ -8,6 +8,8 @@ import core.dto.DTO;
 import core.dto.Message;
 import core.dto.requestmsg.ChatConnection;
 import core.model.ChatModel;
+import core.model.InMemoryChatCounts;
+import core.model.InMemoryLastSenders;
 import core.view.InStreamView;
 import core.view.OutStreamView;
 import org.junit.jupiter.api.*;
@@ -27,13 +29,15 @@ class ConnectChatConnectionThreadTest {
     private Thread serverThread;
     private Thread consumerThread;
 
-    ChatModel chatModel;
-
+    ChatModel chatModel = new ChatModel();
     ChatThreadsController chatThreadsController;
 
-    ChatConnection chco1 = new ChatConnection("1", chatId);
-    ChatConnection chco2 = new ChatConnection("2", chatId);
-    ChatConnection chco3 = new ChatConnection("3", chatId);
+    InMemoryChatCounts inMemoryChatCounts = InMemoryChatCounts.getInstance();
+    InMemoryLastSenders inMemoryLastSenders = InMemoryLastSenders.getInstance();
+
+    ChatConnection chco1 = new ChatConnection("Alice", chatId);
+    ChatConnection chco2 = new ChatConnection("Bob", chatId);
+    ChatConnection chco3 = new ChatConnection("Charlie", chatId);
 
     @BeforeEach
     void setUp() throws InterruptedException, IOException {
@@ -63,7 +67,7 @@ class ConnectChatConnectionThreadTest {
         ServerSocketController.stopServer();
         consumerThread.interrupt();
 
-        MsgQueue.getInstance().clear();
+        MsgQueueController.getInstance().clear();
 
         // Wait for server and consumer threads to finish
         if (serverThread.isAlive()) {
@@ -75,6 +79,9 @@ class ConnectChatConnectionThreadTest {
         }
 
         chatThreadsController.getThreads(chatId).clear();
+        chatModel.removeMsgsForTest(chatId);
+        inMemoryChatCounts.clearKey(chatId);
+        inMemoryLastSenders.clearkey(chatId);
     }
 
     @Test
@@ -166,6 +173,8 @@ class ConnectChatConnectionThreadTest {
             assertEquals(chco1.getChatId(), msg.getChatId());
             assertEquals(chco1.getUsername(), msg.getUsername());
             assertEquals("Test message", msg.getMessage());
+            assertEquals("Alice", inMemoryLastSenders.getValue(chatId));
+            assertEquals(1, inMemoryChatCounts.getValue(chatId));
         }
     }
 
@@ -207,6 +216,90 @@ class ConnectChatConnectionThreadTest {
             assertEquals(chco1.getChatId(), msg2.getChatId());
             assertEquals(chco1.getUsername(), msg2.getUsername());
             assertEquals("Test message", msg2.getMessage());
+            assertEquals("Alice", inMemoryLastSenders.getValue(chatId));
+            assertEquals(1, inMemoryChatCounts.getValue(chatId));
+        }
+    }
+
+    @Test
+    @DisplayName("명령어 확인해보기 - 출제")
+    void 채팅테스트6() throws IOException, InterruptedException {
+        try (Socket sc1 = new Socket("localhost", port);
+             Socket sc2 = new Socket("localhost", port);) {
+            OutStreamView<DTO> out1 = new OutStreamView<>(sc1);
+            out1.send(new DTO(RequestType.CONNECTCHAT, chco1));
+            Thread.sleep(100);
+            OutStreamView<DTO> out2 = new OutStreamView<>(sc2);
+            out2.send(new DTO(RequestType.CONNECTCHAT, chco2));
+            Thread.sleep(100);
+
+            OutStreamView<Message> msgOut = new OutStreamView<>(sc1);
+            msgOut.send(new Message(chco1.getChatId(), chco1.getUsername(), "/문제 홍길동"));
+            Thread.sleep(100);
+
+            InStreamView<Message> in1 = new InStreamView<>(sc1, Message.class);
+            InStreamView<Message> in2 = new InStreamView<>(sc2, Message.class);
+
+            Message msg1 = in1.read();
+            assertEquals("admin", msg1.getUsername());
+            assertTrue(msg1.getMessage().contains("게임을 새로"));
+            Message msg2 = in2.read();
+            assertEquals("admin", msg2.getUsername());
+            assertTrue(msg2.getMessage().contains("게임을 새로"));
+        }
+    }
+
+    @Test
+    @DisplayName("명령어 확인해보기 - 네")
+    void 채팅테스트7() throws IOException, InterruptedException {
+        try (Socket sc1 = new Socket("localhost", port);
+             Socket sc2 = new Socket("localhost", port);) {
+            OutStreamView<DTO> out1 = new OutStreamView<>(sc1);
+            out1.send(new DTO(RequestType.CONNECTCHAT, chco1));
+            Thread.sleep(100);
+            OutStreamView<DTO> out2 = new OutStreamView<>(sc2);
+            out2.send(new DTO(RequestType.CONNECTCHAT, chco2));
+            Thread.sleep(100);
+
+            OutStreamView<Message> msgOut = new OutStreamView<>(sc1);
+            msgOut.send(new Message(chco1.getChatId(), chco1.getUsername(), "/네"));
+            Thread.sleep(100);
+
+            InStreamView<Message> in1 = new InStreamView<>(sc1, Message.class);
+            InStreamView<Message> in2 = new InStreamView<>(sc2, Message.class);
+
+            Message msg2 = in2.read();
+            assertEquals(chco1.getUsername(), msg2.getUsername());
+            assertTrue(msg2.getMessage().contains("네"));
+        }
+    }
+
+    @Test
+    @DisplayName("명령어 확인해보기 - 정답")
+    void 채팅테스트8() throws IOException, InterruptedException {
+        try (Socket sc1 = new Socket("localhost", port);
+             Socket sc2 = new Socket("localhost", port);) {
+            OutStreamView<DTO> out1 = new OutStreamView<>(sc1);
+            out1.send(new DTO(RequestType.CONNECTCHAT, chco1));
+            Thread.sleep(100);
+            OutStreamView<DTO> out2 = new OutStreamView<>(sc2);
+            out2.send(new DTO(RequestType.CONNECTCHAT, chco2));
+            Thread.sleep(100);
+
+            inMemoryLastSenders.storeValue(chatId, chco1.getUsername());
+            OutStreamView<Message> msgOut = new OutStreamView<>(sc1);
+            msgOut.send(new Message(chco1.getChatId(), chco1.getUsername(), "/정답"));
+            Thread.sleep(100);
+
+            InStreamView<Message> in1 = new InStreamView<>(sc1, Message.class);
+            InStreamView<Message> in2 = new InStreamView<>(sc2, Message.class);
+
+            Message msg1 = in1.read();
+            assertEquals("admin", msg1.getUsername());
+            assertTrue(msg1.getMessage().contains(chco1.getUsername()));
+            Message msg2 = in2.read();
+            assertEquals("admin", msg2.getUsername());
+            assertTrue(msg2.getMessage().contains(chco1.getUsername()));
         }
     }
 

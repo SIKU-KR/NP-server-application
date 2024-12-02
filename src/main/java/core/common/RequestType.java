@@ -7,5 +7,5 @@ import java.io.Serializable;
  * Imagine API Endpoint, works like it.
  */
 public enum RequestType {
-    ROOMLIST, NEWROOM, CONNECTCHAT, LOGIN
+    ROOMLIST, NEWROOM, CONNECTCHAT, LOGIN, USERLIST
 }

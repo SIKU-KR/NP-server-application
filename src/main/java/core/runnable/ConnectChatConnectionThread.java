@@ -1,7 +1,7 @@
 package core.runnable;
 
 import core.common.AppLogger;
-import core.common.MsgQueue;
+import core.controller.MsgQueueController;
 import core.controller.ChatThreadsController;
 import core.dto.requestmsg.ChatConnection;
 import core.dto.Message;
@@ -77,7 +77,7 @@ public class ConnectChatConnectionThread implements Runnable {
         if (message != null) {
             AppLogger.formalInfo(socket, "RECEIVED", "message: '" + message.getMessage() + "'");
             chatModel.createNewMsg(chatId, username, message.getMessage());
-            MsgQueue.getInstance().enqueue(message);
+            MsgQueueController.getInstance().enqueue(message);
         }
     }
 

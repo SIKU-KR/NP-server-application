@@ -8,24 +8,29 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
- * Access to Chat table in MySQL dbms.
+ * Access to Chat table in MySQL DBMS.
  */
-public class RoomModel extends DBConnection {
+public class RoomModel {
 
     public List<ChatRoom> readRoomList() {
         List<ChatRoom> roomList = new ArrayList<>();
-        String sql = "SELECT * FROM Chat Order By timestamp";
-        List<Map<String, Object>> result = executeQuery(sql);
-        for (Map<String, Object> row : result) {
-            Integer id = (Integer) row.get("id");
-            String name = (String) row.get("title");
-            String creator = (String) row.get("creator");
-            Timestamp timestamp = (Timestamp) row.get("timestamp");
-            LocalDateTime time = timestamp.toLocalDateTime();
-            roomList.add(new ChatRoom(id, name, creator, time));
+        String sql = "SELECT * FROM Chat ORDER BY timestamp";
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(sql);
+             ResultSet resultSet = pstmt.executeQuery()) {
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("title");
+                String creator = resultSet.getString("creator");
+                LocalDateTime time = resultSet.getTimestamp("timestamp").toLocalDateTime();
+                roomList.add(new ChatRoom(id, name, creator, time));
+            }
+        } catch (SQLException e) {
+            AppLogger.error("Error reading room list: " + e.getMessage());
         }
         return roomList;
     }
@@ -35,7 +40,9 @@ public class RoomModel extends DBConnection {
         LocalDateTime currentTime = LocalDateTime.now();
         Timestamp timestamp = Timestamp.valueOf(currentTime);
 
-        try (PreparedStatement pstmt = getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
             pstmt.setString(1, name);
             pstmt.setString(2, creator);
             pstmt.setTimestamp(3, timestamp);
@@ -54,15 +61,17 @@ public class RoomModel extends DBConnection {
                 }
             }
         } catch (SQLException e) {
-            AppLogger.error(e.getMessage());
+            AppLogger.error("Error creating room: " + e.getMessage());
             throw new RuntimeException("Database error occurred while creating a new room.");
         }
     }
 
     public void removeRoomForTest(String roomName) {
         String sql = "DELETE FROM Chat WHERE title = ?";
-        try (Connection connection = getConnection();
+
+        try (Connection connection = DBConnection.getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql)) {
+
             pstmt.setString(1, roomName);
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows == 0) {
@@ -71,7 +80,7 @@ public class RoomModel extends DBConnection {
                 AppLogger.info("Room with title '" + roomName + "' deleted successfully.");
             }
         } catch (SQLException e) {
-            AppLogger.error("Error occurred while deleting room: " + e.getMessage());
+            AppLogger.error("Error deleting room: " + e.getMessage());
             throw new RuntimeException("Database error occurred while deleting the room.");
         }
     }

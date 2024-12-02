@@ -38,6 +38,12 @@ new DTO(RequestType.CONNECTCHAT, new ChatConnection(userId, chatId));
 new DTO(RequestType.LOGIN, new UserLogin("Charlie"));
 ```
 
+5. 사용자 목록가져오기
+```java
+int chatId = 1;
+new DTO(RequestType.LISTUSER, Integer.of(chatId));
+```
+
 > 클라이언트 개발에 필요한 API 목록을 카톡으로 말해주시면 만들게요.
 
 ## json 주고 받기
