@@ -43,6 +43,7 @@ public class InStreamView<T> {
             case NEWROOM -> requestMsg = gson.fromJson(jsonObject.get("requestMsg"), NewRoom.class);
             case CONNECTCHAT -> requestMsg = gson.fromJson(jsonObject.get("requestMsg"), ChatConnection.class);
             case LOGIN -> requestMsg = gson.fromJson(jsonObject.get("requestMsg"), UserLogin.class);
+            case USERLIST -> requestMsg = gson.fromJson(jsonObject.get("requestMsg"), Integer.class);
         }
         return new DTO(requestType, requestMsg);
     }

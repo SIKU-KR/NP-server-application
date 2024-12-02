@@ -29,7 +29,7 @@ class NewRoomConnectionThreadTest {
     private ExecutorService serverExecutor;
 
     // 테스트 데이터
-    NewRoom newRoom = new NewRoom("박범식", "테스트게임방");
+    NewRoom newRoom = new NewRoom("bumshik", "테스트게임방");
     DTO dto = new DTO(RequestType.NEWROOM, newRoom);
 
     @BeforeEach
@@ -70,7 +70,7 @@ class NewRoomConnectionThreadTest {
             InStreamView<ChatRoom> in = new InStreamView<>(socket, ChatRoom.class);
             ChatRoom response = in.read();
             assertEquals("테스트게임방", response.getName());
-            assertEquals("박범식", response.getCreator());
+            assertEquals("bumshik", response.getCreator());
 
         } catch (IOException e) {
             e.printStackTrace();

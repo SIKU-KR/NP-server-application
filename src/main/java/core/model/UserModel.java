@@ -10,12 +10,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 
-public class UserModel extends DBConnection {
+public class UserModel {
+
     public Optional<User> checkUserExists(String username) {
         String sql = "SELECT * FROM User WHERE name = ?";
-
-        try (Connection connection = getConnection();
+        try (Connection connection = DBConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
+
             statement.setString(1, username);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -32,21 +33,25 @@ public class UserModel extends DBConnection {
 
     public void createUser(String username) {
         String sql = "INSERT INTO User (name, score) VALUES (?, 0)";
-        try (Connection connection = getConnection();
+        try (Connection connection = DBConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
+
             statement.setString(1, username);
             statement.executeUpdate();
-        } catch (SQLException e){
+        } catch (SQLException e) {
             AppLogger.error(e.getMessage());
         }
     }
 
-    // Method for test
-    public void deleteUser(String username) throws SQLException{
+    public void deleteUser(String username) {
         String sql = "DELETE FROM User WHERE name = ?";
-        try(Connection connection = getConnection();
-        PreparedStatement statement = connection.prepareStatement(sql)){
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
             statement.setString(1, username);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            AppLogger.error(e.getMessage());
         }
     }
 }

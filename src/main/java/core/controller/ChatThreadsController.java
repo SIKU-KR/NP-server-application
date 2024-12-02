@@ -1,6 +1,5 @@
 package core.controller;
 
-import core.common.AppLogger;
 import core.runnable.ConnectChatConnectionThread;
 
 import java.util.List;
@@ -44,5 +43,19 @@ public class ChatThreadsController {
         if (connections != null) {
             connections.remove(connectionThread);
         }
+    }
+
+    public List<String> getChatConnections(int id) {
+        if (id == 0) {
+            // if id == 0, get all usernames of all thread
+            return this.chatConnections.values().stream()
+                    .flatMap(List::stream).map(ConnectChatConnectionThread::getUsername)
+                    .toList();
+        }
+        if (this.chatConnections.containsKey(id)) {
+            return this.chatConnections.get(id).stream()
+                    .map(ConnectChatConnectionThread::getUsername).toList();
+        }
+        return List.of();
     }
 }

@@ -1,64 +1,55 @@
 package core.common;
 
-import java.io.FileInputStream;
-import java.io.IOException;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
 import java.io.InputStream;
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Properties;
 
 /**
- * DBConnection is class to connect database(MySQL)
- * Must be inherited to use connection to database
- * File "/src/main/resources/application.properties" configures connection information.
+ * DBConnection with HikariCP for connection pooling.
  */
+public class DBConnection {
+    private static HikariDataSource dataSource;
 
-public abstract class DBConnection {
-    private String url;
-    private String user;
-    private String password;
-
-    public DBConnection() {
-        loadDatabaseConfig();
-        System.out.println("Connected to the database");
-    }
-
-    private void loadDatabaseConfig() {
-        Properties properties = new Properties();
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
-            if (input == null) {
-                throw new IOException("application.properties not found in classpath");
-            }
-            properties.load(input);
-            this.url = properties.getProperty("db.url");
-            this.user = properties.getProperty("db.username");
-            this.password = properties.getProperty("db.password");
-        } catch (IOException e) {
-            AppLogger.error("Failed to load database configuration: " + e.getMessage());
-        }
-    }
-
-    public List<Map<String, Object>> executeQuery(String query) {
-        List<Map<String, Object>> results = new ArrayList<>();
-        try (Connection connection = getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
-
-            int columnCount = resultSet.getMetaData().getColumnCount();
-            while (resultSet.next()) {
-                Map<String, Object> row = new HashMap<>();
-                for (int i = 1; i <= columnCount; i++) {
-                    row.put(resultSet.getMetaData().getColumnName(i), resultSet.getObject(i));
+    static {
+        try {
+            Properties properties = new Properties();
+            try (InputStream input = DBConnection.class.getClassLoader().getResourceAsStream("application.properties")) {
+                if (input == null) {
+                    throw new RuntimeException("application.properties not found in classpath");
                 }
-                results.add(row);
+                properties.load(input);
             }
+
+            HikariConfig config = new HikariConfig();
+            config.setJdbcUrl(properties.getProperty("db.url"));
+            config.setUsername(properties.getProperty("db.username"));
+            config.setPassword(properties.getProperty("db.password"));
+            config.setMaximumPoolSize(Integer.parseInt(properties.getProperty("db.hikari.maximumPoolSize", "10")));
+            config.setMinimumIdle(Integer.parseInt(properties.getProperty("db.hikari.minimumIdle", "2")));
+            config.setIdleTimeout(Long.parseLong(properties.getProperty("db.hikari.idleTimeout", "30000")));
+            config.setConnectionTimeout(Long.parseLong(properties.getProperty("db.hikari.connectionTimeout", "30000")));
+            config.setMaxLifetime(Long.parseLong(properties.getProperty("db.hikari.maxLifetime", "1800000")));
+
+            dataSource = new HikariDataSource(config);
+            AppLogger.info("HikariCP DataSource initialized");
         } catch (Exception e) {
-            AppLogger.error(e.getMessage());
+            AppLogger.error("Failed to initialize HikariCP DataSource: " + e.getMessage());
+            throw new RuntimeException(e);
         }
-        return results;
     }
 
-    public Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(url, user, password);
+    public static Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
+    }
+
+    public void closeDataSource() {
+        if (dataSource != null && !dataSource.isClosed()) {
+            dataSource.close();
+            System.out.println("HikariCP DataSource closed");
+        }
     }
 }
-
