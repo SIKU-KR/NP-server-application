@@ -15,10 +15,10 @@ import java.util.List;
  * 2. msgHandler() : sends to chat room members based on ChatThreadsController(Map)
  */
 public class MsgQueueConsumer implements Runnable {
-    private MsgQueueController msgQueueController;
-    private InMemoryChatCounts inMemoryChatCounts;
-    private InMemoryLastSenders inMemoryLastSenders;
-    private ChatThreadsController chatThreadsController;
+    private final MsgQueueController msgQueueController;
+    private final InMemoryChatCounts inMemoryChatCounts;
+    private final InMemoryLastSenders inMemoryLastSenders;
+    private final ChatThreadsController chatThreadsController;
     private boolean isRunning = true;
 
     public MsgQueueConsumer() {
