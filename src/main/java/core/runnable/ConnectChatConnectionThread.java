@@ -58,6 +58,10 @@ public class ConnectChatConnectionThread implements Runnable {
             while (running) {
                 Message msg = in.read();
                 processMessage(msg);
+                if(msg == null){
+                    stop();
+                    break;
+                }
             }
         } catch (Exception e) {
             AppLogger.formalError(socket, e);
@@ -89,6 +93,7 @@ public class ConnectChatConnectionThread implements Runnable {
     public void stop() {
         running = false;
         ChatThreadsController.getInstance().removeThread(chatId, this);
+        AppLogger.formalInfo(socket, "STOPPED", "socket connection stopped");
         try {
             if (!socket.isClosed()) {
                 socket.close();
