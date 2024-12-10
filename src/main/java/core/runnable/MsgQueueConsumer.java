@@ -75,7 +75,7 @@ public class MsgQueueConsumer implements Runnable {
 
     private void processGeneralMsg(Message msg) {
         Integer chatId = msg.getChatId();
-        if (inMemoryChatCounts.getValue(chatId) > 20) {
+        if (inMemoryChatCounts.getValue(chatId) >= 20) {
             sendToThreads(new Message(chatId, "admin", "이미 20번의 질문기회를 사용하셨습니다."));
         }
         inMemoryChatCounts.addValue(chatId);
